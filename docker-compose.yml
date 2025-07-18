@@ -1,0 +1,56 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: it-app_postgres
+    environment:
+      POSTGRES_DB: itapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Go Microservice
+  app:
+    build: .
+    container_name: it-app_user_service
+    environment:
+      # Database
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: itapp
+      
+      # Server
+      PORT: 8080
+      ENVIRONMENT: development
+      
+      # Logging
+      LOG_LEVEL: info
+      
+      # Rate Limiting
+      RATE_LIMIT_RPS: 100
+      RATE_LIMIT_BURST: 200
+      
+      # Firebase
+      FIREBASE_PROJECT_ID: innovatech-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./firebase-service-account.json:/root/firebase-service-account.json:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
