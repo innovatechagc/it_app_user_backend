@@ -42,7 +42,7 @@ services:
       RATE_LIMIT_BURST: 200
       
       # Firebase
-      FIREBASE_PROJECT_ID: innovatech-app
+      FIREBASE_PROJECT_ID: innovatech-agc
     ports:
       - "8080:8080"
     volumes:

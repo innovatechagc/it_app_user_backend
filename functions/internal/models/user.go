@@ -12,6 +12,7 @@ type User struct {
 	Username        string     `json:"username" gorm:"uniqueIndex;size:50;not null"`
 	FirstName       string     `json:"first_name" gorm:"size:100"`
 	LastName        string     `json:"last_name" gorm:"size:100"`
+	PhotoURL        string     `json:"photo_url" gorm:"size:500"`
 	Provider        string     `json:"provider" gorm:"size:50"`
 	ProviderID      string     `json:"provider_id" gorm:"size:128"`
 	CreatedAt       time.Time  `json:"created_at" gorm:"autoCreateTime"`
@@ -32,9 +33,10 @@ type CreateUserRequest struct {
 	Username      string `json:"username" validate:"required,min=3,max=50,alphanum"`
 	FirstName     string `json:"first_name" validate:"max=100"`
 	LastName      string `json:"last_name" validate:"max=100"`
-	Provider      string `json:"provider" validate:"max=50"`
+	Provider      string `json:"provider" validate:"required,oneof=google.com facebook.com password"`
 	ProviderID    string `json:"provider_id" validate:"max=128"`
 	Status        string `json:"status" validate:"oneof=active inactive pending"`
+	PhotoURL      string `json:"photo_url" validate:"omitempty,url"`
 }
 
 type UpdateUserRequest struct {
@@ -102,4 +104,22 @@ type UserStats struct {
 	
 	// Relación con User
 	User User `json:"user,omitempty" gorm:"foreignKey:UserID"`
+}
+// Additional authentication models (LoginRequest and LoginResponse are in auth.go)
+type SocialAuthRequest struct {
+	Provider     string `json:"provider" validate:"required,oneof=google facebook"`
+	AccessToken  string `json:"access_token" validate:"required"`
+	Email        string `json:"email" validate:"required,email"`
+	FirstName    string `json:"first_name" validate:"max=100"`
+	LastName     string `json:"last_name" validate:"max=100"`
+	PhotoURL     string `json:"photo_url" validate:"omitempty,url"`
+	ProviderID   string `json:"provider_id" validate:"required"`
+}
+
+type RegisterRequest struct {
+	Email     string `json:"email" validate:"required,email,max=255"`
+	Password  string `json:"password" validate:"required,min=6"`
+	Username  string `json:"username" validate:"required,min=3,max=50,alphanum"`
+	FirstName string `json:"first_name" validate:"max=100"`
+	LastName  string `json:"last_name" validate:"max=100"`
 }

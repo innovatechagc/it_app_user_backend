@@ -13,6 +13,8 @@ func SetupUserRoutes(router *mux.Router, userHandler *handlers.UserHandler, auth
 	
 	// Rutas públicas de usuarios
 	userRouter.HandleFunc("", userHandler.GetAllUsers).Methods("GET")
+	userRouter.HandleFunc("/create", userHandler.CreateUser).Methods("POST") // Registro público
+	userRouter.HandleFunc("/test", userHandler.TestConnection).Methods("POST") // Test para Flutter
 	userRouter.HandleFunc("/{id:[0-9]+}", userHandler.GetUserByID).Methods("GET")
 	userRouter.HandleFunc("/firebase/{firebase_id}", userHandler.GetUserByFirebaseID).Methods("GET")
 	userRouter.HandleFunc("/username/{username}", userHandler.GetUserByUsername).Methods("GET")
@@ -25,8 +27,7 @@ func SetupUserRoutes(router *mux.Router, userHandler *handlers.UserHandler, auth
 		protectedUserRouter := userRouter.PathPrefix("").Subrouter()
 		protectedUserRouter.Use(authMiddleware.RequireAuth)
 		
-		// CRUD protegido
-		protectedUserRouter.HandleFunc("/create", userHandler.CreateUser).Methods("POST")
+		// CRUD protegido (create está en rutas públicas para registro)
 		protectedUserRouter.HandleFunc("/{id:[0-9]+}", userHandler.UpdateUser).Methods("PUT")
 		protectedUserRouter.HandleFunc("/{id:[0-9]+}", userHandler.DeleteUser).Methods("DELETE")
 		
@@ -38,7 +39,7 @@ func SetupUserRoutes(router *mux.Router, userHandler *handlers.UserHandler, auth
 		protectedUserRouter.HandleFunc("/{id:[0-9]+}/stats", userHandler.GetUserStats).Methods("GET")
 	} else {
 		// Si no hay autenticación, todas las rutas son públicas (desarrollo)
-		userRouter.HandleFunc("/create", userHandler.CreateUser).Methods("POST")
+		// create ya está en rutas públicas arriba
 		userRouter.HandleFunc("/{id:[0-9]+}", userHandler.UpdateUser).Methods("PUT")
 		userRouter.HandleFunc("/{id:[0-9]+}", userHandler.DeleteUser).Methods("DELETE")
 		userRouter.HandleFunc("/{id:[0-9]+}/login", userHandler.UpdateLoginInfo).Methods("POST")

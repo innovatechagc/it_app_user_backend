@@ -2,7 +2,8 @@ package models
 
 // Auth models - Modelos relacionados con autenticación
 type LoginRequest struct {
-	IDToken string `json:"id_token" validate:"required"`
+	IDToken  string `json:"id_token" validate:"required"`
+	Provider string `json:"provider,omitempty"`
 }
 
 type LoginResponse struct {

@@ -13,6 +13,9 @@ func SetupAuthRoutes(router *mux.Router, authHandler *handlers.AuthHandler, auth
 	
 	// Rutas públicas de autenticación
 	authRouter.HandleFunc("/login", authHandler.Login).Methods("POST")
+	authRouter.HandleFunc("/google", authHandler.GoogleLogin).Methods("POST")
+	authRouter.HandleFunc("/facebook", authHandler.FacebookLogin).Methods("POST")
+	authRouter.HandleFunc("/email", authHandler.EmailPasswordLogin).Methods("POST")
 	authRouter.HandleFunc("/logout", authHandler.Logout).Methods("POST")
 	authRouter.HandleFunc("/status", authHandler.CheckAuthStatus).Methods("GET")
 	authRouter.HandleFunc("/refresh", authHandler.RefreshToken).Methods("POST")
